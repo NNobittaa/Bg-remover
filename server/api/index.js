@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+const PORT=3000
 import connectDB from '../configs/mongodb.js'
 
 const app = express()
