@@ -1,31 +1,34 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-// Assuming './configs/mongodb.js' handles the connection logic
 import connectDB from './configs/mongodb.js' 
+import userRouter from './routes/user.routes.js'
 
-// --- Configuration ---
-const PORT = process.env.PORT || 3000
+// --- Configuration & Initialization ---
 const app = express()
 
-// --- Middleware Setup ---
-app.use(express.json()) // Allows parsing of JSON request bodies
-app.use(cors()) // Enables Cross-Origin Resource Sharing
+// Middleware Setup
+app.use(express.json())
+app.use(cors())
 
-// --- Database Connection ---
-// The connectDB function is awaited here to ensure connection before starting the server.
-await connectDB()
+// --- Initialize Database Connection State ---
+// This ensures connectDB is only called once during the cold start phase.
+let isDbConnected = false;
+const connectOnce = async () => {
+    if (!isDbConnected) {
+        await connectDB();
+        isDbConnected = true;
+    }
+}
+
 
 // --- API Routes ---
-
-// 1. Root Route - simple health check
 app.get('/', (req, res)=> {
     res.json({ message: 'Personal Voice Assistant API is running!', version: '1.0.0' })
 })
 
-// 2. Placeholder Route for Assistant Features
-// This is the endpoint where your client-side voice assistant will send its commands.
-// You will replace this with a dedicated router file for clean separation (e.g., assistantRoutes.js)
+app.use('/api/users', userRouter)
+
 app.use('/api/assistant', (req, res) => {
     res.status(200).json({ 
         status: 'OK', 
@@ -35,10 +38,9 @@ app.use('/api/assistant', (req, res) => {
 });
 
 
-// --- Global Error Handler (MUST be the last middleware before the listen call) ---
-// This catches all errors thrown during route processing.
+// --- Global Error Handler ---
 app.use((err, req, res, next) => {
-    console.error(err.stack) // Log the error stack for debugging
+    console.error(err.stack)
     res.status(err.status || 500).json({
         error: {
             message: err.message || 'An unknown server error occurred!',
@@ -48,8 +50,18 @@ app.use((err, req, res, next) => {
 })
 
 
-// --- Server Start ---
-app.listen(PORT, ()=> {
-    console.log(`\n\n[INFO] 🚀 Server Running on port ${PORT}`)
-    console.log(`[INFO] 🌐 Access the API at http://localhost:${PORT}`)
-})
+// The main handler for Vercel:
+// 1. Ensures DB is connected.
+// 2. Uses the express 'app' instance to handle the request.
+// 3. We export the 'app' instead of calling app.listen().
+// 
+// NOTE: Vercel often requires a 'vercel.json' file to correctly handle Express.
+export default async function handler(req, res) {
+    try {
+        await connectOnce(); // Ensure DB connection before handling request
+        app(req, res); // Let Express handle the request
+    } catch (error) {
+        console.error("Vercel Handler Error:", error);
+        res.status(500).json({ error: "Failed to initialize server resources." });
+    }
+}
