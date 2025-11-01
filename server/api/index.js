@@ -10,7 +10,6 @@ app.use(cors())
 await connectDB()
 
 app.get('/', (req, res) => {
-  res.send('API working ✅ (from Vercel)')
+  res.send('API working ✅ from Vercel')
 })
-
 export default app
