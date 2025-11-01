@@ -13,5 +13,5 @@ app.use(express.json())
 app.use(cors())
 
 //API Routes 
-app.get('bg-remover-a1g4.vercel.app', (req, res)=>res.send("API working"))
+app.get('/', (req, res)=>res.send("API working"))
 app.listen(PORT, ()=> console.log("Server running on PORT http://localhost:"+PORT))
