@@ -8,15 +8,17 @@ const Steps = () => {
           Steps to remove background <br className="" /> image in seconds
         </p>
       </h1>
-      <div className=" relative flex justify-center items-center h-[200px]">
-        <model-viewer className='absolute  h-[400px]'
+      <div className="flex justify-center items-center h-[80vh] relative max-md:h-[50vh]">
+        <model-viewer className='w-full h-full absolute '
           src="Linksfinal.glb"
-          alt="Bee 3D Model"
+          alt="Cat 3D Model"
           autoplay
-          camera-controls
+          animation-6
+          camera-controls 
+          disable-zoom
           shadow-intensity="0.8"
         ></model-viewer>
-      </div>
+      </div >
       <div className="flex gap-10 justify-center flex-wrap mx-4 pb-10 md:px-40">
         <div className="inline-flex border p-7 gap-4 items-start text-xl transition-all duration-300 hover:scale-105 cursor-pointer bg-white drop-shadow-md rounded-lg pb-10">
           <img className="" src="/upload_icon.svg" alt="" />
