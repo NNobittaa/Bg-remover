@@ -12,4 +12,6 @@ await connectDB()
 app.get('/', (req, res) => {
   res.send('API working ✅ from Vercel')
 })
+
+app.listen(4000)
 export default app
