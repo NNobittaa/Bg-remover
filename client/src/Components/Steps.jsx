@@ -9,11 +9,11 @@ const Steps = () => {
         </p>
       </h1>
       <div className="flex justify-center items-center h-[80vh] relative max-md:h-[50vh]">
-        <model-viewer className='w-full h-full absolute '
+        <model-viewer className='w-full h-full absolute'
           src="Linksfinal.glb"
           alt="Cat 3D Model"
           autoplay
-          animation-6
+          animation-name="animation-6"
           camera-controls 
           disable-zoom
           shadow-intensity="0.8"

@@ -7,7 +7,7 @@ const Header = () => {
         <div className=''>
             <p className='text-4xl xl:text-5xl 2xl:text-6xl font-bold text-700 text-neutral-700 leading-tight'>
                 Remove the <br className='max-md:hidden' />
-                <span className='bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent'>background</span> from <br max-md:hidde />
+                <span className='bg-gradient-to-r from-violet-600 to-fuchsia-500 bg-clip-text text-transparent'>background</span> from <br className='max-md:hidden' />
                 images for free.
             </p>
             <p className='text-gray-500 my-6 text-[15px]'>
