@@ -3,6 +3,7 @@ import userModel from '../models/userModels.js'
 
 const clerkWebhooks = async (req, res) => {
   try {
+    
     // ✅ Correct constructor
     const whook = new Webhook(process.env.CLERK_WEBHOOK_KEY)
 
