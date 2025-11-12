@@ -12,7 +12,7 @@ await connectDB()
 app.use(cors())
 
 // Use raw body parser for webhooks BEFORE json parser
-app.use('/api/user/webhooks', express.raw({ type: 'application/json' }))
+app.use('/api/user/webhooks')
 
 // Use json parser for other routes
 app.use(express.json())
