@@ -11,7 +11,6 @@ const Navbar = () => {
   //   if(isSignedIn)
   //     loadCreditsData()
   // })
-  
   return (
     <div className=' flex sm:h-20 h-14 justify-around items-center '>
         <Link to='/'><img src="/logo.svg" className='' width={150} alt="" /></Link> 

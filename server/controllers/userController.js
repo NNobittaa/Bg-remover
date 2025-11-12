@@ -5,7 +5,7 @@ import userModel from '../models/userModels.js'
 
 const clerkWebhooks = async (req, res)=>{
     try {
-        const whook = webhook(process.env.CLERK_WEBHOOK_KEY)
+        const whook = new webhook(process.env.CLERK_WEBHOOK_KEY)
         // console.log(JSON.stringify(req.body))
 
         await whook.verify(JSON.stringify(req.body), {
@@ -21,7 +21,7 @@ const clerkWebhooks = async (req, res)=>{
             case "user.created":{
                 const userData = {
                     clerkId:data.id, 
-                    email:data.email_addresses[0].email_addresse,
+                    email:data.email_addresses[0].email_address,
                     first_Name:data.first_name, 
                     photo:data.image_url
                 }
@@ -35,7 +35,7 @@ const clerkWebhooks = async (req, res)=>{
 
                 const userData = {
                     clerkId:data.id, 
-                    email:data.email_addresses[0].email_addresse,
+                    email:data.email_addresses[0].email_address,
                     first_Name:data.first_name, 
                     photo:data.image_url
                 }
@@ -45,7 +45,7 @@ const clerkWebhooks = async (req, res)=>{
             }
             case "user.deleted":{
 
-                await userModel.findByIdAndDelete({clerkId:data.id})
+                await userModel.findOneAndDelete({ clerkId: data.id })
                 res.json({})
 
                 break;
