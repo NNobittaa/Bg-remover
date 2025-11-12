@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { useContext, useEffect, React } from 'react'
-import { AppContext } from '../context/AppContext'
+// import { AppContext } from '../context/AppContext'
  
 const Navbar = () => {
   const {openSignIn} = useClerk()
