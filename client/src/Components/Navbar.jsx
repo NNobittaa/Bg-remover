@@ -7,10 +7,10 @@ const Navbar = () => {
   const {openSignIn} = useClerk()
   const {isSignedIn,user } = useUser()
   // const {credit, loadCreditsData} = useContext(AppContext)
-  useEffect(() => {
-    if(isSignedIn)
-      loadCreditsData()
-  })
+  // useEffect(() => {
+  //   if(isSignedIn)
+  //     loadCreditsData()
+  // })
   
   return (
     <div className=' flex sm:h-20 h-14 justify-around items-center '>
