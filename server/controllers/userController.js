@@ -1,13 +1,14 @@
-// server/controllers/userController.js
 import { Webhook } from 'svix'
 import userModel from '../models/userModels.js'
 
 const clerkWebhooks = async (req, res) => {
   try {
+    console.log("🔔 Webhook received") // Add this to see if route is hit
+    
     const whook = new Webhook(process.env.CLERK_WEBHOOK_KEY)
 
-    // Handle both raw and parsed body
-    const payload = typeof req.body === 'string' ? req.body : JSON.stringify(req.body)
+    // Convert raw body buffer to string
+    const payload = req.body.toString()
 
     await whook.verify(payload, {
       "svix-id": req.headers["svix-id"],
@@ -15,7 +16,7 @@ const clerkWebhooks = async (req, res) => {
       "svix-signature": req.headers["svix-signature"]
     })
 
-    console.log("Webhook verified successfully ✅")
+    console.log("✅ Webhook verified successfully")
 
     const { data, type } = JSON.parse(payload)
 
@@ -54,13 +55,14 @@ const clerkWebhooks = async (req, res) => {
       }
 
       default:
+        console.log("ℹ️ Unhandled event type:", type)
         res.json({ success: true })
     }
 
   } catch (error) {
     console.log("❌ Webhook Error:", error.message)
-    res.status(400).json({ success: false, message: error.message })
+    res.status(400).json({ success: false, message: error.message})
   }
 }
 
-export { clerkWebhooks }
+export default clerkWebhooks
