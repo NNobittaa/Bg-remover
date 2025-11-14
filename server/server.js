@@ -13,7 +13,7 @@ await connectDB()
 app.use(cors());
 
 // Raw body parser ONLY for Clerk webhooks - MUST come before other routes
-// app.use('/api/user/webhooks', express.raw({ type: 'application/json' }));
+app.use('/api/user/webhooks', express.raw({ type: 'application/json' }));
 
 // Normal body parser for everything else
 app.use(express.json());
