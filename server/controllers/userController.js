@@ -3,22 +3,60 @@ import userModel from '../models/userModels.js'
 
 const clerkWebhooks = async (req, res) => {
   try {
-    console.log("🔔 Webhook received") // Add this to see if route is hit
+    console.log("🔔 Webhook received")
+    console.log("Headers:", req.headers)
+    console.log("Body type:", typeof req.body)
     
+    // Check if body exists
+    if (!req.body) {
+      console.log("❌ No body received")
+      return res.status(400).json({ success: false, message: "No body received" })
+    }
+
     const whook = new Webhook(process.env.CLERK_WEBHOOK_KEY)
 
-    // Convert raw body buffer to string
-    const payload = req.body.toString()
+    // Convert buffer to string
+    const payload = Buffer.isBuffer(req.body) 
+      ? req.body.toString('utf8') 
+      : JSON.stringify(req.body)
+    
+    // Get headers - note the lowercase
+    const svixId = req.headers['svix-id']
+    const svixTimestamp = req.headers['svix-timestamp']
+    const svixSignature = req.headers['svix-signature']
 
-    await whook.verify(payload, {
-      "svix-id": req.headers["svix-id"],
-      "svix-timestamp": req.headers["svix-timestamp"],
-      "svix-signature": req.headers["svix-signature"]
-    })
+    // Check if we have all required headers
+    if (!svixId || !svixTimestamp || !svixSignature) {
+      console.log("❌ Missing svix headers")
+      return res.status(400).json({ 
+        success: false, 
+        message: "Missing svix headers" 
+      })
+    }
 
+    const headers = {
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature
+    }
+
+    console.log("Verifying webhook...")
+    
+    // Verify the webhook
+    let evt
+    try {
+      evt = whook.verify(payload, headers)
+    } catch (err) {
+      console.log("❌ Webhook verification failed:", err.message)
+      return res.status(400).json({ 
+        success: false, 
+        message: "Webhook verification failed" 
+      })
+    }
+    
     console.log("✅ Webhook verified successfully")
 
-    const { data, type } = JSON.parse(payload)
+    const { data, type } = evt
 
     switch (type) {
       case "user.created": {
@@ -61,7 +99,8 @@ const clerkWebhooks = async (req, res) => {
 
   } catch (error) {
     console.log("❌ Webhook Error:", error.message)
-    res.status(400).json({ success: false, message: error.message})
+    console.log("Error stack:", error.stack)
+    res.status(400).json({ success: false, message: error.message })
   }
 }
 

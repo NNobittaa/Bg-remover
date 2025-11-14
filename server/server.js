@@ -7,16 +7,18 @@ import userRouter from './routes/userRoutes.js'
 const PORT = process.env.PORT || 4000
 const app = express() 
 
-// Raw body parser ONLY for Clerk webhooks  
-app.use('/api/user/webhooks', express.raw({ type: "*/*" }));
+await connectDB()
+
+// CORS should be first
+app.use(cors());
+
+// Raw body parser ONLY for Clerk webhooks - MUST come before other routes
+// app.use('/api/user/webhooks', express.raw({ type: 'application/json' }));
 
 // Normal body parser for everything else
 app.use(express.json());
-app.use(cors());
 
-await connectDB()
-
-// Initialize middleware 
+// Initialize routes 
 app.use("/api/user", userRouter);
 
 app.get('/',(req, res)=>res.send("API Working"))
