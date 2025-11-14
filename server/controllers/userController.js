@@ -75,7 +75,7 @@ const clerkWebhooks = async (req, res) => {
 
       case "user.updated": {
         const userData = {
-          email: data.email_addresses[0].email_address,
+          email: evt.data.email_addresses[0].email_address,
           firstName: data.first_name,
           photo: data.image_url
         }
