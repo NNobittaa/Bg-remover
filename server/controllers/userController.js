@@ -1,107 +1,46 @@
-import { Webhook } from 'svix'
-import userModel from '../models/userModels.js'
+import { Webhook } from "svix";
 
 const clerkWebhooks = async (req, res) => {
   try {
-    console.log("🔔 Webhook received")
-    console.log("Headers:", req.headers)
-    console.log("Body type:", typeof req.body)
-    
-    // Check if body exists
-    if (!req.body) {
-      console.log("❌ No body received")
-      return res.status(400).json({ success: false, message: "No body received" })
-    }
+    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    const whook = new Webhook(process.env.CLERK_WEBHOOK_KEY)
+    const evt = wh.verify(req.body, {
+      "svix-signature": req.headers["svix-signature"],
+    });
 
-    // Convert buffer to string
-    const payload = Buffer.isBuffer(req.body) 
-      ? req.body.toString('utf8') 
-      : JSON.stringify(req.body)
-    
-    // Get headers - note the lowercase
-    const svixId = req.headers['svix-id']
-    const svixTimestamp = req.headers['svix-timestamp']
-    const svixSignature = req.headers['svix-signature']
+    console.log("Webhook received:", evt.type);
 
-    // Check if we have all required headers
-    if (!svixId || !svixTimestamp || !svixSignature) {
-      console.log("❌ Missing svix headers")
-      return res.status(400).json({ 
-        success: false, 
-        message: "Missing svix headers" 
-      })
-    }
+    if (evt.type === "user.created") {
+      const user = evt.data;
 
-    const headers = {
-      "svix-id": svixId,
-      "svix-timestamp": svixTimestamp,
-      "svix-signature": svixSignature
-    }
+      const email =
+        user.email_addresses &&
+        user.email_addresses.length > 0
+          ? user.email_addresses[0].email_address
+          : null;
 
-    console.log("Verifying webhook...")
-    
-    // Verify the webhook
-    let evt
-    try {
-      evt = whook.verify(payload, headers)
-    } catch (err) {
-      console.log("❌ Webhook verification failed:", err.message)
-      return res.status(400).json({ 
-        success: false, 
-        message: "Webhook verification failed" 
-      })
-    }
-    
-    console.log("✅ Webhook verified successfully")
+      console.log("User Email:", email);
 
-    const { data, type } = evt
-
-    switch (type) {
-      case "user.created": {
-        const userData = {
-          clerkId: data.id,
-          email: data.email_addresses[0].email_address,
-          firstName: data.first_name,
-          photo: data.image_url
-        }
-
-        await userModel.create(userData)
-        console.log("✅ User created in database:", userData.email)
-        res.json({ success: true })
-        break
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: "No email found in Clerk payload",
+        });
       }
 
-      case "user.updated": {
-        const userData = {
-          email: evt.data.email_addresses[0].email_address,
-          firstName: data.first_name,
-          photo: data.image_url
-        }
-        await userModel.findOneAndUpdate({ clerkId: data.id }, userData)
-        console.log("✅ User updated in database")
-        res.json({ success: true })
-        break
-      }
+      // Save user to DB
+      // await UserModel.create({ clerkId: user.id, email });
 
-      case "user.deleted": {
-        await userModel.findOneAndDelete({ clerkId: data.id })
-        console.log("✅ User deleted from database")
-        res.json({ success: true })
-        break
-      }
-
-      default:
-        console.log("ℹ️ Unhandled event type:", type)
-        res.json({ success: true })
+      return res.status(200).json({ success: true });
     }
 
+    return res.status(200).json({ success: true });
   } catch (error) {
-    console.log("❌ Webhook Error:", error.message)
-    console.log("Error stack:", error.stack)
-    res.status(400).json({ success: false, message: error.message })
+    console.error("Webhook error:", error.message);
+    return res
+      .status(400)
+      .json({ success: false, message: error.message });
   }
-}
+};
 
-export default clerkWebhooks
+export default clerkWebhooks;
