@@ -38,25 +38,39 @@ const clerkWebhooks = async (req, res) => {
 
     console.log("Webhook received:", evt.type);
 
-    if (evt.type === "user.created") {
+    if (evt.type === "user.created" || evt.type === "user.updated") {
       const user = evt.data;
 
-      const email =
-        user.email_addresses &&
-        user.email_addresses.length > 0
-          ? user.email_addresses[0].email_address
-          : null;
+      // Debug: Log the entire payload to see structure
+      console.log("Full user data:", JSON.stringify(user, null, 2));
 
-      console.log("User Email:", email);
+      // Try multiple ways to get email
+      let email = null;
+      
+      if (user.email_addresses && user.email_addresses.length > 0) {
+        email = user.email_addresses[0].email_address;
+      } else if (user.primary_email_address_id && user.email_addresses) {
+        const primaryEmail = user.email_addresses.find(
+          e => e.id === user.primary_email_address_id
+        );
+        email = primaryEmail?.email_address;
+      }
+
+      console.log("Extracted email:", email);
+      console.log("Email addresses array:", user.email_addresses);
 
       if (!email) {
         return res.status(400).json({
           success: false,
           message: "No email found in Clerk payload",
+          debug: {
+            hasEmailAddresses: !!user.email_addresses,
+            emailAddressesLength: user.email_addresses?.length || 0
+          }
         });
       }
 
-      // Save user to DB
+      // Save user to DB (use upsert to avoid duplicates)
       const userData = {
         clerkId: user.id,
         email: email,
@@ -65,9 +79,14 @@ const clerkWebhooks = async (req, res) => {
         lastName: user.last_name || "",
       };
 
-      await userModel.create(userData);
+      // Use findOneAndUpdate with upsert to handle both create and update
+      await userModel.findOneAndUpdate(
+        { clerkId: user.id },
+        userData,
+        { upsert: true, new: true }
+      );
       
-      console.log("User created successfully:", userData);
+      console.log("User saved successfully:", userData);
 
       return res.status(200).json({ success: true });
     }
