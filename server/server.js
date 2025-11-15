@@ -12,7 +12,7 @@ await connectDB()
 app.use(cors())
 
 // RAW BODY for Clerk
-app.post('/api/user/webhooks', express.raw({ type: 'application/json' }))
+app.use('/api/user/webhooks', express.raw({ type: 'application/json' }))
 
 // JSON parser for all other routes
 app.use(express.json())
