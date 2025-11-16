@@ -9,7 +9,7 @@ import { messageInRaw } from "svix";
 const removeBgImage = async (req, res) => {
     // console.log("hi")
   try {
-    const { clerkId } = req.body;
+    const { clerkId } = req.headers;
 
     const user = await userModel.findOne({ clerkId });
 
@@ -24,8 +24,8 @@ const removeBgImage = async (req, res) => {
     //Reading the image file
     const imageFile = fs.createReadStream(imagePath) 
 
-    const FormData = new FormData()
-    FormData.append('image_file', imageFile)
+    const formData = new FormData()
+    formData.append('image_file', imageFile)
 
     const {data} = await axios.post("https://clipdrop-api.co/remove-background/v1", FormData, {
         headers:{
