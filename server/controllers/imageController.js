@@ -1,6 +1,6 @@
 import axios from "axios";
 import fs from "fs";
-import formData from "form-data";
+import FormData from "form-data";
 import userModel from "../models/userModels.js";
 import { messageInRaw } from "svix";
 
@@ -24,10 +24,10 @@ const removeBgImage = async (req, res) => {
     //Reading the image file
     const imageFile = fs.createReadStream(imagePath) 
 
-    const formData = new FormData()
-    formData.append('image_file', imageFile)
+    const FormData = new FormData()
+    FormData.append('image_file', imageFile)
 
-    const {data} = axios.post("https://clipdrop-api.co/remove-background/v1", formData, {
+    const {data} = await axios.post("https://clipdrop-api.co/remove-background/v1", FormData, {
         headers:{
             'x-api-key' : process.env.CLIPDROP_API
         }, 

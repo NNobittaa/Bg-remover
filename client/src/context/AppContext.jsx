@@ -51,10 +51,10 @@ const AppContextProvider = (props) =>{
             setresultImage(false)
             navigate('/result')
             const token = await getToken()
-            const formData = new FormData()
-            image && formData.append('image', image)
+            const FormData = new FormData()
+            image && FormData.append('image', image)
 
-            const {data} = await axios.post(backendurl+'/api/image/remove-bg', formData, {headers:{token}})
+            const {data} = await axios.post(backendurl+'/api/image/remove-bg', FormData, {headers:{token}})
             
             if (data.success){
                 setresultImage(data.resultImage)
