@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom'
 import { useClerk, UserButton, useUser } from '@clerk/clerk-react'
 import { useEffect, React } from 'react'
-// import { AppContext } from '../context/AppContext'
+import { AppContext } from '../context/AppContext'
+import { useContext } from 'react'
+
  
 const Navbar = () => {
   const {openSignIn} = useClerk()
   const {isSignedIn,user } = useUser()
-  // const {credit, loadCreditsData} = useContext(AppContext)
-  // useEffect(() => {
-  //   if(isSignedIn)
-  //     loadCreditsData()
-  // })
+  const {credit, loadCreditsData} = useContext(AppContext)
+  useEffect(() => {
+    if(isSignedIn)  
+      loadCreditsData()
+  })
   return (
     <div className=' flex sm:h-20 h-14 justify-around items-center '>
         <Link to='/'><img src="/logo.svg" className='' width={150} alt="" /></Link> 
