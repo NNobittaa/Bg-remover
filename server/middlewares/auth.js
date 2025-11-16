@@ -8,11 +8,13 @@ const authUser = async(req, res, next)=>{
         const {token} = req.headers
         // console.log(req.headers)
         // console.log(token)
-        console.log("req:"+req)
-        console.log("body:"+req.headers)
+        console.log("Auth --> req : "+req)
+        console.log("Auth --> body : "+req.headers)
+        // console.log("Auth --> token : "+token)
 
         if(!token){
             return res.json({success:false, message:'Not Authorized'})
+            console.log("Error hai token me ")
         }
 
         const token_decode = jwt.decode(token)
@@ -21,7 +23,7 @@ const authUser = async(req, res, next)=>{
         // const body = JSON.parse(req.headers.toString());
         // console.log(body)
         // body.clerkId = token_decode.clerkId
-        console.log(req.headers.clerkId)
+        console.log("Auth --> clerkId : "+req.headers.clerkId)
         next()  
     }
     catch(error){

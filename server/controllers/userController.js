@@ -27,10 +27,10 @@ export const clerkWebhooks = async (req, res)=> {
 export const userCredits = async(req, res)=>{
     try{
         const { clerkId } = req.headers
-        console.log("Controller clerkId:"+clerkId)
+        console.log("userController--> userCredits --> clerkId : "+clerkId)
         // console.log(req.headers)
         const userData = await userModel.findOne({clerkId})
-        console.log("UserData:"+userData)
+        console.log("userController--> userCredits --> UserData:"+userData)
         res.json({success:true, credits: userData.creditBalance})
     }
     catch(error){
