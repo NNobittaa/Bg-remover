@@ -8,8 +8,8 @@ const authUser = async(req, res, next)=>{
         const {token} = req.headers
         // console.log(req.headers)
         // console.log(token)
-        console.log("Auth --> req : "+req)
-        console.log("Auth --> body : "+req.headers)
+        // console.log("Auth --> req : "+req)
+        // console.log("Auth --> body : "+req.headers)
         // console.log("Auth --> token : "+token)
 
         if(!token){
@@ -18,12 +18,9 @@ const authUser = async(req, res, next)=>{
         }
 
         const token_decode = jwt.decode(token)
-        console.log(token_decode)
+        // console.log(token_decode)
         req.headers.clerkId = token_decode.clerkId
-        // const body = JSON.parse(req.headers.toString());
-        // console.log(body)
-        // body.clerkId = token_decode.clerkId
-        console.log("Auth --> clerkId : "+req.headers.clerkId)
+        // console.log("Auth --> clerkId : "+req.headers.clerkId)
         next()  
     }
     catch(error){
