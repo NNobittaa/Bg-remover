@@ -6,8 +6,8 @@ import { messageInRaw } from 'svix'
 const authUser = async(req, res, next)=>{
     try{
         const {token} = req.headers
-        console.log(req.headers)
-        console.log(token)
+        // console.log(req.headers)
+        // console.log(token)
         if(!token){
             return res.json({success:false, message:'Not Authorized'})
         }

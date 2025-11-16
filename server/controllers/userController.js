@@ -13,7 +13,7 @@ export const clerkWebhooks = async (req, res)=> {
                 "svix-signature": req.headers["svix-signature"],
             }
           );
-          console.log(req.body)
+        //   console.log(req.body)
           
           console.log("Webhook Verified:", evt.type);
           res.json({ success: true });
@@ -27,6 +27,7 @@ export const clerkWebhooks = async (req, res)=> {
 export const userCredits = async(req, res)=>{
     try{
         const { clerkId } = req.body
+        console.log(clerkId)
         const userData = await userModel.findOne({clerkId})
         res.json({success:true, credits: userData.creditBalance})
     }

@@ -3,10 +3,10 @@ import { useAuth } from "@clerk/clerk-react";
 import { useState } from "react";
 import axios from "axios";
 
-
 export const AppContext = createContext()
 
 const AppContextProvider = (props) =>{
+    
     const [credit, setcredit] = useState(false)
 
     const backendurl = import.meta.env.VITE_BACKEND_URL
