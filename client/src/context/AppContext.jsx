@@ -6,7 +6,7 @@ import axios from "axios";
 export const AppContext = createContext()
 
 const AppContextProvider = (props) =>{
-    
+
     const [credit, setcredit] = useState(false)
 
     const backendurl = import.meta.env.VITE_BACKEND_URL
@@ -19,7 +19,7 @@ const AppContextProvider = (props) =>{
             const {data} = await axios.get(backendurl+'/api/user/credits', {headers:{token}})
             if (data.success){
                 setcredit(data.credit)
-                console.log(data.credit )
+                // console.log(data.credit )
             }
         }
         catch(error){

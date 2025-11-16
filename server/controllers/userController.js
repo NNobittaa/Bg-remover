@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import jwt from'jsonwebtoken'
-
+import userModel from "../models/userModels.js";
 export const clerkWebhooks = async (req, res)=> {
     try {
         const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
@@ -26,9 +26,11 @@ export const clerkWebhooks = async (req, res)=> {
 
 export const userCredits = async(req, res)=>{
     try{
-        const { clerkId } = req.body
-        console.log(clerkId)
+        const { clerkId } = req.headers
+        console.log("Controller clerkId:"+clerkId)
+        // console.log(req.headers)
         const userData = await userModel.findOne({clerkId})
+        console.log("UserData:0"+userData)
         res.json({success:true, credits: userData.creditBalance})
     }
     catch(error){
