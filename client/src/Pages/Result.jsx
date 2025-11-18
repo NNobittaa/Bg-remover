@@ -22,11 +22,11 @@ const Result = () => {
         </div>
         {/* Right */}
         <div className="flex flex-col gap-8 rounded-md w-1/2 ">
-          <p className="font-semibold  text-gray-600">Background Removed</p>
-          <div className="rounded-lg border-gray-400 drop-shadow-md border h-full relative bg-layer overflow-hidden ">
-            
+          <p className="font-semibold text-gray-600">Background Removed</p>
+          <div className="rounded-lg border-gray-400 drop-shadow-md border h-full relative bg-layer overflow-hidden">
+            <img src={resultImage?resultImage:""} alt="" />
             {
-              !resultImage && image && 
+              !resultImage && image &&
             <div className="absolute right-1/2 bottom-1/2 transform translate-x-1/2 translate-y-1/2">
               <div className="border-4 border-violet-600 rounded-full h-12 w-12 border-t-transparent animate-spin "></div>
             </div>
