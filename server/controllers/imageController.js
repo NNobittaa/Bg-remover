@@ -23,16 +23,15 @@ const removeBgImage = async (req, res) => {
 
     //Reading the image file
     const imageFile = fs.createReadStream(imagePath) 
-
     const formData = new FormData()
     formData.append('image_file', imageFile)
 
-    const {data} = await axios.post("https://clipdrop-api.co/remove-background/v1", FormData, {
-        headers:{
-            'x-api-key' : process.env.CLIPDROP_API
-        }, 
-        responseType:'arraybuffer'
-    })
+    const {data} = await axios.post("https://clipdrop-api.co/remove-background/v1", formData, {
+    headers:{
+        'x-api-key' : process.env.CLIPDROP_API
+    }, 
+    responseType:'arraybuffer'
+})
 
     const base64Image = Buffer.from(data, 'binary').toString('base64')
 

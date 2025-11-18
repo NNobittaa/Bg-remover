@@ -8,7 +8,6 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 export const AppContext = createContext()
-
 const AppContextProvider = (props) =>{
 
     const [credits, setcredits] = useState(false)
@@ -66,20 +65,17 @@ const AppContextProvider = (props) =>{
                     navigate('/buy')
                 }
             }
-
         }
-
         catch(error){
             console.log(error)
             toast.error(error.message)
         }
-
-
     }
 
     const value = {credits,
         setcredits,
-        loadCreditsData,backendurl,image, setimage, removeBg
+        loadCreditsData,backendurl,image, setimage, removeBg,
+        resultImage, setresultImage
          
     }
     return(
