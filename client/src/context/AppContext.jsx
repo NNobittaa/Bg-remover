@@ -3,8 +3,6 @@ import { SignedIn, SignIn, useAuth, useUser, useClerk } from "@clerk/clerk-react
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-
-
 import { useNavigate } from "react-router-dom";
 
 export const AppContext = createContext()
@@ -20,8 +18,9 @@ const AppContextProvider = (props) =>{
     const {getToken} = useAuth()
 
     const {isSignedIn} = useUser()
-    const {openSignIn} = useClerk()
 
+    const {openSignIn} = useClerk()
+    
     // console.log("AppContext --> getToken : "+getToken)   
 
     const loadCreditsData = async()=>{
