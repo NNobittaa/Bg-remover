@@ -29,7 +29,20 @@ const BuyCredit = () => {
       receipt: order.receipt,
       handler: async (response) => {
         console.log(response);
-        await loadCreditsData();
+        // await loadCreditsData();
+        const token = await getToken()
+        try{
+          const {data}= await axios.post(backendurl+'/api/user/verify-razor', response,{ headers:{token}})
+          if(data.success){
+            loadCreditsData()
+            navigate('/')
+            toast.success('Credits Added')
+          }
+        }
+        catch(error){
+          console.log(error)
+          toast.error(error.message)
+        }
       },
     };
     const rzp = new window.Razorpay(options);
