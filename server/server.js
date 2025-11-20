@@ -10,7 +10,13 @@ const app = express()
 
 await connectDB()
 
-app.use(cors())
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+}));
+
 
 // RAW BODY for Clerk
 app.use('/api/user/webhooks', express.raw({ type: 'application/json' }))
