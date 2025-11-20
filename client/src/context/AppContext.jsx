@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import { SignedIn, SignIn, useAuth, useUser, useClerk } from "@clerk/clerk-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -27,11 +27,22 @@ const AppContextProvider = (props) =>{
         try{
             const token = await getToken()
             // console.log("AppContext --> Token : "+token)
-            const {data} = await axios.get(backendurl+'/api/user/credits', {headers:{token}, timeout: 10000 })
+            const {data} = await axios.get(backendurl+'/api/user/credits', {headers:{token}, timeout: 30000})
             // console.log(data)
             if (data.success){
                 setcredits(data.credits)
                 console.log(data.credits)
+            }else {
+                // Agar credits load nahi hue toh retry karo
+                console.log("Retrying to fetch credits...")
+                // Network error pe user-friendly message
+            if (error.code === 'ECONNABORTED') {
+                toast.error('Slow network. Please wait...')
+                // Retry after 3 seconds
+                setTimeout(loadCreditsData, 3000)
+            } else {
+                toast.error('Unable to load credits. Check connection.')
+            }
             }
         }
         catch(error){
@@ -52,7 +63,7 @@ const AppContextProvider = (props) =>{
             const formData = new FormData()
             image && formData.append('image', image)
 
-            const {data} = await axios.post(backendurl+'/api/image/remove-bg', formData, {headers:{token}})
+            const {data} = await axios.post(backendurl+'/api/image/remove-bg', formData, {headers:{token}, timeout: 60000})
             
             if (data.success){
                 setresultImage(data.resultImage)
@@ -70,6 +81,12 @@ const AppContextProvider = (props) =>{
             toast.error(error.message)
         }
     }
+
+    useEffect(() => {
+        if (isSignedIn) {
+            loadCreditsData()
+        }
+    }, [isSignedIn])
 
     const value = {credits,
         setcredits,

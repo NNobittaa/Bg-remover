@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useEffect } from "react";
 // import 'dotenv/config'
 import { assets, plans } from "../Assets/assets";
 import { AppContext } from "../context/AppContext";
@@ -8,49 +9,86 @@ import axios from "axios";
 import toast from "react-hot-toast";
 const BuyCredit = () => {
   const { loadCreditsData } = useContext(AppContext);
-  
-  const backendurl = import.meta.env.VITE_BACKEND_URL
+
+  const backendurl = import.meta.env.VITE_BACKEND_URL;
 
   // console.log(backendurl)
 
   const navigate = useNavigate();
 
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
   const { getToken } = useAuth();
 
   const initPay = async (order) => {
-    console.log(order)
+    console.log(order);
     const options = {
-      key:import.meta.env.VITE_RAZORPAY_KEY_ID,
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
       name: "Credits Payment",
       description: "Credits Payment",
       order_id: order.id,
       receipt: order.receipt,
+      modal: {
+        ondismiss: function () {
+          toast.error("Payment cancelled");
+        },
+      },
       handler: async (response) => {
         console.log(response);
         // await loadCreditsData();
-        const token = await getToken()
-        try{
-          const {data}= await axios.post(backendurl+'/api/user/verify-razor', response,{ headers:{token}})
-          if(data.success){
-            loadCreditsData()
-            navigate('/')
-            toast.success('Credits Added')
+        const token = await getToken();
+        try {
+          const { data } = await axios.post(
+            backendurl + "/api/user/verify-razor",
+            response,
+            { headers: { token } }
+          );
+          if (data.success) {
+            loadCreditsData();
+            navigate("/");
+            toast.success("Credits Added");
           }
-        }
-        catch(error){
-          console.log(error)
-          toast.error(error.message)
+        } catch (error) {
+          console.log(error);
+          toast.error(error.message);
         }
       },
+      // Failure handler
+      modal: {
+        ondismiss: function () {
+          toast.error("Payment cancelled");
+        },
+        confirm_close: true,
+      },
     };
+    if (isMobile) {
+      options.config = {
+        display: {
+          blocks: {
+            banks: {
+              name: "Pay via UPI or Cards",
+              instruments: [
+                { method: "upi" },
+                { method: "card" },
+                { method: "wallet" },
+                { method: "netbanking" },
+              ],
+            },
+          },
+          sequence: ["block.banks"],
+          preferences: {
+            show_default_blocks: true,
+          },
+        },
+      };
+    }
     const rzp = new window.Razorpay(options);
     rzp.open();
     console.log("RAZORPAY KEY:", import.meta.env.VITE_RAZORPAY_KEY_ID);
-
   };
-  
+
   // console.log(key)
   const paymentRazorpay = async (planId) => {
     try {
@@ -58,10 +96,10 @@ const BuyCredit = () => {
       const { data } = await axios.post(
         backendurl + "/api/user/pay-razor",
         { planId },
-        { headers:{ token }}
+        { headers: { token } }
       );
-      console.log(backendurl + "/api/user/pay-razor")
-      console.log(data)
+      console.log(backendurl + "/api/user/pay-razor");
+      console.log(data);
       if (data.success) {
         initPay(data.order);
       }
@@ -70,6 +108,21 @@ const BuyCredit = () => {
       toast.error(error.message);
     }
   };
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onerror = () => {
+      toast.error("Razorpay SDK failed to load. Check your connection!");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen text-center mt-10">
@@ -102,6 +155,13 @@ const BuyCredit = () => {
             </button>
           </div>
         ))}
+        {isMobile && (
+          <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-sm text-yellow-800 text-center">
+              📱 Payment will open in a mobile-friendly popup
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
