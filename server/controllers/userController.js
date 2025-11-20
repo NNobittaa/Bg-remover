@@ -36,7 +36,7 @@ export const userCredits = async(req, res)=>{
         res.json({success:true, credits: userData.creditBalance})
     }
     catch(error){
-        console.log(error.message)
+        console.log(error)
         res.json({success:false, message:error.message})
     }
 }
@@ -104,7 +104,7 @@ export const paymentRazorpay = async(req, res)=>{
         })
     }
     catch (error) {
-        console.log(error.message)
+        console.log(error)
         res.json({success:false, message:error.message})
     }
 }
@@ -129,7 +129,7 @@ export const verifyRazorpay = async(req, res) =>{
         }
         
     } catch (error) {
-        console.log(error.message)
+        console.log(error)
         res.json({success:false, message:error.message})
     }
 }
