@@ -55,13 +55,6 @@ const BuyCredit = () => {
           toast.error(error.message);
         }
       },
-      // Failure handler
-      modal: {
-        ondismiss: function () {
-          toast.error("Payment cancelled");
-        },
-        confirm_close: true,
-      },
     };
     if (isMobile) {
       options.config = {
