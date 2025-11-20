@@ -28,7 +28,7 @@ export const clerkWebhooks = async (req, res)=> {
 
 export const userCredits = async(req, res)=>{
     try{
-        const { clerkId } = req.headers
+        const { clerkId } = await req.headers
         // console.log("userController--> userCredits --> clerkId : "+clerkId)
         // console.log(req.headers)
         const userData = await userModel.findOne({clerkId})
@@ -50,8 +50,8 @@ const razorPayInstance = new razorpay({
 //API to make payments for credits
 export const paymentRazorpay = async(req, res)=>{
     try {
-        const {clerkId} = req.headers
-        const {planId} = req.body
+        const {clerkId} = await req.headers
+        const {planId} =  await req.body
         // console.log(clerkId, planId)
         const userData = await userModel.findOne({clerkId})
         if ( !userData || !planId){
@@ -111,7 +111,7 @@ export const paymentRazorpay = async(req, res)=>{
 //API controller function to verify razorpay payment
 export const verifyRazorpay = async(req, res) =>{
     try {
-        const {razorpay_order_id} = req.body
+        const {razorpay_order_id} = await req.body
         const orderInfo = await razorPayInstance.orders.fetch(razorpay_order_id)
         if(orderInfo.status === 'paid' ){
             const transactionData = await transactionModel.findById(orderInfo.receipt)
@@ -120,8 +120,8 @@ export const verifyRazorpay = async(req, res) =>{
             }
             // Adding credits in userData 
             const userData = await userModel.findOne({clerkId:transactionData.clerkId})
-            const creditBalance = userData.creditBalance + transactionData.credits
-            userModel.findByIdAndUpdate(userData._id, {creditBalance})
+            const creditBalance = await userData.creditBalance + transactionData.credits
+            await userModel.findByIdAndUpdate(userData._id, {creditBalance})
 
             //Making the payment true
             await transactionModel.findByIdAndUpdate(transactionData._id, {payment:true})
