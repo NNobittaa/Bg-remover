@@ -16,6 +16,21 @@ export const clerkWebhooks = async (req, res)=> {
             }
           );
         //   console.log(req.body)
+        if (evt.type === 'user.created') {
+            const { id, email_addresses, image_url, first_name, last_name } = evt.data;
+            
+            const userData = {
+                clerkId: id,
+                email: email_addresses[0].email_address,
+                photo: image_url,
+                firstName: first_name,
+                lastName: last_name
+            }
+            
+            // Create new user in database
+            await userModel.create(userData);
+            console.log("User created in database:", userData.email);
+        }
           
           console.log("Webhook Verified:", evt.type);
           res.json({ success: true });
