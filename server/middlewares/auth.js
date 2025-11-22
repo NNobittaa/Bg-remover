@@ -1,30 +1,28 @@
 import jwt from "jsonwebtoken";
-import { messageInRaw } from "svix";
-
-//Middleware function to decode jwt token to get ClerkId
 
 const authUser = async (req, res, next) => {
   try {
     const { token } = req.headers;
-    // console.log(req.headers)
-    // console.log(token)
-    // console.log("Auth --> req : "+req)
-    // console.log("Auth --> body : "+req.headers)
-    // console.log("Auth --> token : "+token)
 
     if (!token) {
-      console.log("Error: No token provided");
-      return res.json({ success: false, message: "Not Authorized" });
+      return res.status(401).json({ success: false, message: "Not Authorized" });
     }
 
     const token_decode = jwt.decode(token);
-    // console.log(token_decode)
-    req.headers.clerkId = token_decode.clerkId;
-    // console.log("Auth --> clerkId : "+req.headers.clerkId)
+    
+    // Try different possible locations for the clerkId
+    const clerkId = token_decode?.clerkId || token_decode?.sub || token_decode?.userId;
+    
+    if (!clerkId) {
+      console.error("ClerkId not found in token:", token_decode);
+      return res.status(401).json({ success: false, message: "Invalid token" });
+    }
+    
+    req.headers.clerkId = clerkId;
     next();
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
