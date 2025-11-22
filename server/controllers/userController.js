@@ -44,7 +44,7 @@ export const clerkWebhooks = async (req, res)=> {
 export const userCredits = async(req, res)=>{
     try{
         const { clerkId } = req.headers
-        const userData = await userModel.findOne({ clerkId: clerkid });
+        const userData = await userModel.findOne({ clerkId: clerkId });
         
         if (!userData) {
             return res.status(404).json({
