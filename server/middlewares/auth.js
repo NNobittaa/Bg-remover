@@ -1,33 +1,31 @@
-import jwt from'jsonwebtoken'
-import { messageInRaw } from 'svix'
+import jwt from "jsonwebtoken";
+import { messageInRaw } from "svix";
 
-//Middleware function to decode jwt token to get ClerkId 
+//Middleware function to decode jwt token to get ClerkId
 
-const authUser = async(req, res, next)=>{
-    try{
-        const {token} = req.headers
-        // console.log(req.headers)
-        // console.log(token)
-        // console.log("Auth --> req : "+req)
-        // console.log("Auth --> body : "+req.headers)
-        // console.log("Auth --> token : "+token)
+const authUser = async (req, res, next) => {
+  try {
+    const { token } = req.headers;
+    // console.log(req.headers)
+    // console.log(token)
+    // console.log("Auth --> req : "+req)
+    // console.log("Auth --> body : "+req.headers)
+    // console.log("Auth --> token : "+token)
 
-        if(!token){
-            return res.json({success:false, message:'Not Authorized'})
-            console.log("Error hai token me ")
-        }
-
-        const token_decode = jwt.decode(token)
-        // console.log(token_decode)
-        req.headers.clerkId = token_decode.clerkId
-        // console.log("Auth --> clerkId : "+req.headers.clerkId)
-        next()  
+    if (!token) {
+      console.log("Error: No token provided");
+      return res.json({ success: false, message: "Not Authorized" });
     }
-    catch(error){
-        console.log(error)
-        res.json({success:false, message:error.message})
 
-    }
-}
+    const token_decode = jwt.decode(token);
+    // console.log(token_decode)
+    req.headers.clerkId = token_decode.clerkId;
+    // console.log("Auth --> clerkId : "+req.headers.clerkId)
+    next();
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
-export default authUser
+export default authUser;

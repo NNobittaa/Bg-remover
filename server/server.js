@@ -11,19 +11,13 @@ const app = express()
 await connectDB()
 
 // Allow multiple origins (development and production)
+// Use only ONE cors configuration
 app.use(cors({
-    origin: "*", 
+    origin: process.env.FRONTEND_URL || "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "token"],
-}));
-
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
-
 
 // RAW BODY for Clerk
 app.use('/api/user/webhooks', express.raw({ type: 'application/json' }))

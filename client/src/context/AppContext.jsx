@@ -24,32 +24,32 @@ const AppContextProvider = (props) =>{
     // console.log("AppContext --> getToken : "+getToken)   
 
     const loadCreditsData = async()=>{
-        try{
-            const token = await getToken()
-            // console.log("AppContext --> Token : "+token)
-            const {data} = await axios.get(backendurl+'/api/user/credits', {headers:{token}, timeout: 30000})
-            // console.log(data)
-            if (data.success){
-                setcredits(data.credits)
-                console.log(data.credits)
-            }else {
-                // Agar credits load nahi hue toh retry karo
-                console.log("Retrying to fetch credits...")
-                // Network error pe user-friendly message
-            if (error.code === 'ECONNABORTED') {
-                toast.error('Slow network. Please wait...')
-                // Retry after 3 seconds
-                setTimeout(loadCreditsData, 3000)
-            } else {
-                toast.error('Unable to load credits. Check connection.')
-            }
-            }
-        }
-        catch(error){
-            console.log(error)
-            toast.error(error.message)
+    try{
+        const token = await getToken()
+        const {data} = await axios.get(backendurl+'/api/user/credits', {
+            headers:{token}, 
+            timeout: 30000
+        })
+        
+        if (data.success){
+            setcredits(data.credits)
+            console.log(data.credits)
+        } else {
+            toast.error(data.message || 'Unable to load credits')
         }
     }
+    catch(error){
+        console.log(error)
+        
+        if (error.code === 'ECONNABORTED') {
+            toast.error('Slow network. Please wait...')
+            setTimeout(loadCreditsData, 3000)
+        } else {
+            toast.error('Unable to load credits. Check connection.')
+        }
+    }
+}
+
     const removeBg = async(image)=>{
         try{
             console.log(image)
@@ -83,16 +83,19 @@ const AppContextProvider = (props) =>{
     }
 
     useEffect(() => {
-        if (isSignedIn) {
-            loadCreditsData()
-        }
-    }, [isSignedIn])
+    if (isSignedIn) {
+        loadCreditsData()
+    } else {
+        // Reset state when user logs out
+        setcredits(false)
+        setimage(false)
+        setresultImage(false)
+    }}, [isSignedIn])
 
     const value = {credits,
         setcredits,
         loadCreditsData,backendurl,image, setimage, removeBg,
         resultImage, setresultImage
-         
     }
     return(
         <AppContext.Provider value={value}>
