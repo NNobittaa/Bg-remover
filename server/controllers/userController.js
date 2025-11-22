@@ -43,8 +43,8 @@ export const clerkWebhooks = async (req, res)=> {
 
 export const userCredits = async(req, res)=>{
     try{
-        const { clerkId } = await req.headers
-        const userData = await userModel.findOne({clerkId})
+        const { clerkId } = req.headers
+        const userData = await userModel.findOne({ clerkId: clerkid });
         
         if (!userData) {
             return res.status(404).json({
@@ -70,8 +70,8 @@ const razorPayInstance = new razorpay({
 //API to make payments for credits
 export const paymentRazorpay = async(req, res)=>{
     try {
-        const {clerkId} = await req.headers
-        const {planId} =  await req.body
+        const {clerkId} = req.headers
+        const {planId} =  req.body
         
         const userData = await userModel.findOne({clerkId})
         if ( !userData || !planId){
@@ -132,7 +132,7 @@ export const paymentRazorpay = async(req, res)=>{
 //API controller function to verify razorpay payment
 export const verifyRazorpay = async(req, res) =>{
     try {
-        const {razorpay_order_id} = await req.body
+        const { razorpay_order_id } = req.body;
         const orderInfo = await razorPayInstance.orders.fetch(razorpay_order_id)
         if(orderInfo.status === 'paid' ){
             const transactionData = await transactionModel.findById(orderInfo.receipt)
