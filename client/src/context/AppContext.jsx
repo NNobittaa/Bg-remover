@@ -20,35 +20,43 @@ const AppContextProvider = (props) =>{
     const {isSignedIn} = useUser()
 
     const {openSignIn} = useClerk()
-    
-    // console.log("AppContext --> getToken : "+getToken)   
 
-    const loadCreditsData = async()=>{
-    try{
-        const token = await getToken()
-        const {data} = await axios.get(backendurl+'/api/user/credits', {
-            headers:{token}, 
-            timeout: 30000
-        })
-        
-        if (data.success){
-            setcredits(data.credits)
-            console.log(data.credits)
-        } else {
-            toast.error(data.message || 'Unable to load credits')
+    const loadCreditsData = async(retryCount = 0) => {
+        try {
+            const token = await getToken()
+            const {data} = await axios.get(backendurl+'/api/user/credits', {
+                headers:{token}, 
+                timeout: 30000
+            })
+            
+            if (data.success) {
+                setcredits(data.credits)
+                console.log(data.credits)
+            } else {
+                // If user not found and we haven't retried too many times, retry after delay
+                if (data.message === "User not found" && retryCount < 3) {
+                    console.log(`User not found, retrying... (${retryCount + 1}/3)`)
+                    setTimeout(() => loadCreditsData(retryCount + 1), 2000)
+                } else {
+                    toast.error(data.message || 'Unable to load credits')
+                }
+            }
+        }
+        catch(error) {
+            console.log(error)
+            
+            if (error.code === 'ECONNABORTED') {
+                toast.error('Slow network. Please wait...')
+                setTimeout(() => loadCreditsData(retryCount), 3000)
+            } else if (error.response?.status === 404 && retryCount < 3) {
+                // User might not be created yet, retry
+                console.log(`Retrying credit load... (${retryCount + 1}/3)`)
+                setTimeout(() => loadCreditsData(retryCount + 1), 2000)
+            } else {
+                toast.error('Unable to load credits. Check connection.')
+            }
         }
     }
-    catch(error){
-        console.log(error)
-        
-        if (error.code === 'ECONNABORTED') {
-            toast.error('Slow network. Please wait...')
-            setTimeout(loadCreditsData, 3000)
-        } else {
-            toast.error('Unable to load credits. Check connection.')
-        }
-    }
-}
 
     const removeBg = async(image)=>{
         try{
@@ -83,14 +91,15 @@ const AppContextProvider = (props) =>{
     }
 
     useEffect(() => {
-    if (isSignedIn) {
-        loadCreditsData()
-    } else {
-        // Reset state when user logs out
-        setcredits(false)
-        setimage(false)
-        setresultImage(false)
-    }}, [isSignedIn])
+        if (isSignedIn) {
+            loadCreditsData()
+        } else {
+            // Reset state when user logs out
+            setcredits(false)
+            setimage(false)
+            setresultImage(false)
+        }
+    }, [isSignedIn])
 
     const value = {credits,
         setcredits,

@@ -15,7 +15,7 @@ export const clerkWebhooks = async (req, res)=> {
                 "svix-signature": req.headers["svix-signature"],
             }
           );
-        //   console.log(req.body)
+        
         if (evt.type === 'user.created') {
             const { id, email_addresses, image_url, first_name, last_name } = evt.data;
             
@@ -32,8 +32,8 @@ export const clerkWebhooks = async (req, res)=> {
             console.log("User created in database:", userData.email);
         }
           
-          console.log("Webhook Verified:", evt.type);
-          res.json({ success: true });
+        console.log("Webhook Verified:", evt.type);
+        res.json({ success: true });
 
     } catch (error) {
         console.error("Webhook Error:", error.message);
@@ -44,15 +44,20 @@ export const clerkWebhooks = async (req, res)=> {
 export const userCredits = async(req, res)=>{
     try{
         const { clerkId } = await req.headers
-        // console.log("userController--> userCredits --> clerkId : "+clerkId)
-        // console.log(req.headers)
         const userData = await userModel.findOne({clerkId})
-        // console.log("userController--> userCredits --> UserData:"+userData)
+        
+        if (!userData) {
+            return res.status(404).json({
+                success: false, 
+                message: "User not found"
+            })
+        }
+        
         res.json({success:true, credits: userData.creditBalance})
     }
     catch(error){
         console.log(error)
-        res.json({success:false, message:error.message})
+        res.status(500).json({success:false, message:error.message})
     }
 }
 
@@ -67,10 +72,10 @@ export const paymentRazorpay = async(req, res)=>{
     try {
         const {clerkId} = await req.headers
         const {planId} =  await req.body
-        // console.log(clerkId, planId)
+        
         const userData = await userModel.findOne({clerkId})
         if ( !userData || !planId){
-            return res.json({success:false, message:"inavalid credentials"})
+            return res.json({success:false, message:"invalid credentials"})
         }
         let credits, plan , amount , date
         switch (planId) { 
@@ -123,6 +128,7 @@ export const paymentRazorpay = async(req, res)=>{
         res.json({success:false, message:error.message})
     }
 }
+
 //API controller function to verify razorpay payment
 export const verifyRazorpay = async(req, res) =>{
     try {
